@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+    <link href="style.css" rel="stylesheet">
+</head>
+<body>
+
+    <div class="row upload-drop-zone text-center mx-auto" id="drop-zone">
+        <p>Just drag and drop PDF files here</p>
+    </div>
+
+    <div class="row col-4 mx-auto text-center mergediv">
+        <button type="button" class="btn col btn-primary mergedoc">MERGE</button>
+        <button type="button" class="btn col btn-danger clearspace">CLEAR</button>
+    </div>
+
+    <div class="container">
+        <div class="card-deck row row-cols-6">
+
+        </div>    
+    </div>
+
+    <script type="text/javascript">
+
+        $(document).ready(function() {
+            $(".mergediv").hide();
+        });
+
+
+    ////////DRAG AND DROP FILE UPLOAD////////
+        $(document).on("dragover", ".upload-drop-zone", function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            $(this).addClass("drop");
+        });
+
+        $(document).on("dragleave", ".upload-drop-zone", function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            $(this).removeClass("drop");
+        });
+
+        $(document).on("drop", ".upload-drop-zone", function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            $(this).removeClass("drop");
+
+            const formdata = new FormData();
+            const formfiles = event.originalEvent.dataTransfer.files;
+            
+            let i = 0;
+            for (const file of formfiles) {
+                formdata.append("file" + i, file);
+                i++;
+            }
+
+            const cfcPath = "PDFManager.cfc?method=splitPDF";
+
+            $.ajax({
+                url: cfcPath,
+                data: formdata,
+                type: 'POST',
+                contentType: false,
+                processData: false,
+                success: function(res) {
+                    const html = $.parseHTML(res);
+
+                    $(".mergediv").show();
+
+                    $(".card-deck").html(html);
+
+                ////////ACTIVATE EVENT LISTENERS FOR NEWLY RENDERED HTML////////
+
+                    // Drag and drop to switch div contents
+
+                    $(".card-deck").on("dragstart", ".card", function(ev) {
+                        ev.originalEvent.dataTransfer.setData("drag_id", ev.target.id);
+                    });
+
+                    $(".card-deck").on("dragover", ".card", function(ev) {
+                        ev.preventDefault();
+                    });
+
+                    $(".card-deck").on("drop", ".card", function(ev) {
+                        ev.preventDefault();
+
+                        const drag_id = ev.originalEvent.dataTransfer.getData("drag_id");
+                        const drop_id = $(ev.target).closest(".card").attr("id");
+
+                        const drag_html = $(`#${drag_id}`).html();
+                        const drop_html = $(`#${drop_id}`).html();
+
+                        $(`#${drag_id}`).html(drop_html);
+                        $(`#${drop_id}`).html(drag_html);
+
+                        $(`#${drag_id}`).attr("id", drop_id);
+                        $(`#${drop_id}`).attr("id", drag_id);
+
+                    });
+
+                    //
+
+                    $(".card-deck").on("click", ".deletepage", function(ev) {
+                        $(ev.target).closest(".card").remove();
+                    });
+
+                    $(".mergediv").on("click", ".mergedoc", mergeDoc);
+                    $(".mergediv").on("click", ".clearspace", clearWorkspace);
+                } 
+            });        
+        });
+
+        // Returns comma delimited list of remaining pages in their arranged order. Used for merging the doc.
+        function getPageList() {
+            let pagelist = ""
+
+            $(".card").each(function(index) {
+                pagelist += $(this).attr("id") + ",";
+            });
+
+            console.log(pagelist);
+
+            return pagelist.slice(0, -1);
+        }
+
+        function mergeDoc() {
+            const formData = {pageList: getPageList()};
+
+            $.post(
+                "PDFManager.cfc?method=mergePDF",
+                formData,
+                function() {
+                    window.open("workspace/document.pdf");
+                }
+            );
+        }
+
+        function clearWorkspace() {
+            
+            $.post(
+                "PDFManager.cfc?method=clearWorkspace",
+                function() {
+                    $(".mergediv").hide();
+                    $(".card-deck").empty();
+                }
+            )
+        }
+
+    </script>
+</body>
+</html>

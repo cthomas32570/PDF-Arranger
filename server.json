@@ -1,0 +1,13 @@
+{
+    "app":{
+        "cfengine":"adobe"
+    },
+    "web":{
+        "host":"localhost",
+        "welcomeFiles":"PDF Arranger.html",
+        "HTTP":{
+            "enable":true,
+            "port":1234
+        }
+    }
+}
