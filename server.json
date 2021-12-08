@@ -6,8 +6,7 @@
         "host":"localhost",
         "welcomeFiles":"PDF Arranger.html",
         "HTTP":{
-            "enable":true,
-            "port":1234
+            "enable":true
         }
     }
 }
