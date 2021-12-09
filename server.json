@@ -4,9 +4,10 @@
     },
     "web":{
         "host":"localhost",
-        "welcomeFiles":"PDF Arranger.html",
+        "welcomeFiles":"index.cfm",
         "HTTP":{
-            "enable":true
+            "enable":true,
+            "port":1234
         }
     }
 }

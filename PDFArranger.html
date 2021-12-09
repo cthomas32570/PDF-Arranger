@@ -76,6 +76,7 @@
                     const html = $.parseHTML(res);
 
                     $(".mergediv").show();
+                    $(".upload-drop-zone").hide();
 
                     $(".card-deck").html(html);
 
@@ -139,8 +140,8 @@
             $.post(
                 "PDFManager.cfc?method=mergePDF",
                 formData,
-                function() {
-                    window.open("workspace/document.pdf");
+                function(res) {
+                    window.open(`workspaces/${res}/document.pdf`);
                 }
             );
         }
@@ -152,6 +153,7 @@
                 function() {
                     $(".mergediv").hide();
                     $(".card-deck").empty();
+                    $(".upload-drop-zone").show();
                 }
             )
         }
