@@ -73,6 +73,7 @@
                 contentType: false,
                 processData: false,
                 success: function(res) {
+                    
                     const html = $.parseHTML(res);
 
                     $(".mergediv").show();
@@ -151,6 +152,9 @@
             $.post(
                 "PDFManager.cfc?method=clearWorkspace",
                 function() {
+                    $(".mergediv").off();
+                    $(".card-deck").off();
+
                     $(".mergediv").hide();
                     $(".card-deck").empty();
                     $(".upload-drop-zone").show();
