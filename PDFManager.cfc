@@ -55,11 +55,18 @@
 
                 <cfoutput>
 
-                    <div class="card col" id="#i#" draggable="true">
-                        <img src="#thumbnail#" class="card-img-top" alt="..." draggable="false">
-                        <div class="card-body">
-                            <h6 class="card-title">Page #i#</h6>
-                            <button type="button" class="btn btn-danger deletepage">X</button>
+                    <div class="col page" id="#i#" draggable="true">
+                        <div class="card shadow-sm">
+                            <img src="#thumbnail#" class="card-img-top" alt="..." draggable="false">
+        
+                            <div class="card-body">
+                            <p class="card-text">Page #i#</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary deletepage">X</button>
+                                </div>
+                            </div>
+                            </div>
                         </div>
                     </div>
 
